@@ -14,7 +14,14 @@
 
 
 static const char *TAG = "ESP_NOW";
-uint8_t broadcast_addr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcast_addr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; 
+
+
+typedef struct{
+    float xdir;
+    float ydir;
+} bot_dir;
+
 
 
 void init_wifi(void)
@@ -37,7 +44,7 @@ void init_wifi(void)
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE));
+    ESP_ERROR_CHECK(esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE)); // wifi channel set to 1
 }
 
 void init_espnow(void) {
@@ -54,10 +61,12 @@ void init_espnow(void) {
 
 
 void transmit_data(void *pvParameter){
+    bot_dir joystick;
     while(1){
-        const char* message;
-        message = "Hello";
-        esp_err_t result = esp_now_send(broadcast_addr, (uint8_t *)message, strlen(message));
+        joystick.xdir = 0;
+        joystick.ydir = 0;
+
+        esp_err_t result = esp_now_send(broadcast_addr, (uint8_t *)&joystick, sizeof(joystick));
         if ( result == ESP_OK){
             ESP_LOGI(TAG, "Sent Successfully \n");
 
@@ -71,12 +80,10 @@ void transmit_data(void *pvParameter){
 
 void app_main(void)
 {
-
     init_wifi();
     init_espnow();
 
 
-
-    xTaskCreate(transmit_data, "Broadcast Loop", 2048, NULL, 1, NULL);
+    xTaskCreate(transmit_data, "Broadcast Loop", 2048, NULL, 1, NULL); // RTOS Task
     
 }
