@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "esp_system.h"
 #include "string.h"
 #include "esp_mac.h"
@@ -61,10 +62,23 @@ void init_espnow(void) {
 
 
 void transmit_data(void *pvParameter){
+    char input[100];
+    float speed;
     bot_dir joystick;
     while(1){
+        printf("Enter a speed: ");
+        fflush(stdout);
+        if (fgets(input, sizeof(input),stdin)!=NULL){
+            char *endptr;
+            speed = strtof(input, &endptr);
+            if (endptr==input){
+                printf("Invalid Input\n");
+            } else{
+                joystick.ydir = speed;
+            }
+
+        }
         joystick.xdir = 0.0;
-        joystick.ydir = 0.67;
 
         esp_err_t result = esp_now_send(broadcast_addr, (uint8_t *)&joystick, sizeof(joystick));
         if ( result == ESP_OK){
