@@ -63,8 +63,8 @@ void init_espnow(void) {
 void transmit_data(void *pvParameter){
     bot_dir joystick;
     while(1){
-        joystick.xdir = 0;
-        joystick.ydir = 0;
+        joystick.xdir = 0.0;
+        joystick.ydir = 0.67;
 
         esp_err_t result = esp_now_send(broadcast_addr, (uint8_t *)&joystick, sizeof(joystick));
         if ( result == ESP_OK){
