@@ -1,4 +1,4 @@
-## Tx side (BeerBot )
+## Tx side (BeerBotTx )
 
 The transmitter side ESP-32 broadcasts direction data to the receiver side ESP-32s.
 
