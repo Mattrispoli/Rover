@@ -14,6 +14,9 @@
 #include "driver/ledc.h"
 
 
+#define LOGIC_INPUT_1 GPIO_NUM_16
+#define LOGIC_INPUT_2 GPIO_NUM_18
+
 QueueHandle_t data_queue;
 
 int64_t timeCheck;
@@ -49,7 +52,7 @@ static void pwm_init(void){
         .hpoint = 0
     };
     ESP_ERROR_CHECK(ledc_channel_config(&channel));
-    ledc_fade_func_install(0);
+    
 }
 
 
@@ -94,8 +97,18 @@ void receiveMsg(void *pvParameter){
         if (xQueueReceive(data_queue, &data_recv, portMAX_DELAY) == pdTRUE){
             ESP_LOGI(TAG, "%f\n%f", data_recv.xdir, data_recv.ydir);
             if (data_recv.ydir > 1.0f) data_recv.ydir = 1.0f;
-            if (data_recv.ydir < 0.0f) data_recv.ydir = 0.0f;
+            if (data_recv.ydir < -1.0f) data_recv.ydir = -1.0f;
 
+            if (data_recv.ydir == 0.0){           //Input for L298N motor controller
+                gpio_set_level(LOGIC_INPUT_1,0);  //Logic input 1 and 2 connect to input 1 and 2 on motor controller
+                gpio_set_level(LOGIC_INPUT_2,0);  //PWM GPIO connects to Enable on motor controller
+            }else if(data_recv.ydir<0){
+                gpio_set_level(LOGIC_INPUT_1,1);
+                gpio_set_level(LOGIC_INPUT_1,0);
+            }else if(data_recv.ydir>0){
+                gpio_set_level(LOGIC_INPUT_1,0);
+                gpio_set_level(LOGIC_INPUT_1,1);
+            }
             uint32_t duty = (uint32_t)(data_recv.ydir * ((1 << LEDC_TIMER_8_BIT) - 1));
             ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
             ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
