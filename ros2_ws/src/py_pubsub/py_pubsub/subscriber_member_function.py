@@ -18,7 +18,7 @@ class Subscriber(Node):
 
     def listener_callback(self, msg):
         self.get_logger().info('I heard: "%f, %f, %f"' % (msg.x, msg.y, msg.z))
-        esp_ser = serial.Serial("COM0", baudrate=115200)
+        esp_ser = serial.Serial("COM0", baudrate=115200)#change com to uart used with rpi
         esp_ser.write("%f, %f, %f" % (msg.x, msg.y, msg.z))
         
 def main(args=None):
