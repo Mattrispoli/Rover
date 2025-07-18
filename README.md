@@ -8,4 +8,4 @@ Rx side is only configured for forward and backward movement. Separate Rx receiv
 PWM is utilized on the Rx side. Rx expects x and y direction values from -1.0 to 1.0.
 
 ## Ros Workspace
-Publishes directional data from input and sends to subscriber which will communicate with the Tx ESP-32.
+Publishes directional data from input and sends to subscriber which communicates with the Tx ESP-32.
